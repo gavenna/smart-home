@@ -21,7 +21,9 @@ typedef enum
 
 int get_touch();
 
-void get_ts_point(ts_point *p);
+int get_touch_suolue();
+
+int get_touch_suolue_goto();
 
 move_dir_t get_ts_direction(void);
 

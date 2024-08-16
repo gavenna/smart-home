@@ -5,6 +5,10 @@
 #include <sys/mman.h>
 #include <linux/input.h>
 #include <stdio.h>
+#include <errno.h>
+#include <stdlib.h>
+
+#include "ts.h"
 
 // 触摸屏函数,可以判断手指是否点击了指定的位置
 int get_touch()
@@ -65,80 +69,159 @@ int get_touch()
     }
 }
 
-
-void get_ts_point(ts_point* p)
+// 触摸屏函数,可以判断手指是否点击了指定的位置(suolue)
+int get_touch_suolue()
 {
-    int ret;
-    int fd;
-
-    fd = open("/dev/input/event0", O_RDONLY);
-    if (fd == -1)
+    // 1.打开触摸屏
+    int fd_touch = open("/dev/input/event0", O_RDWR);
+    if (fd_touch == -1)
     {
-        perror("failed to open /dev/input/event0");
-        return ;
+        printf("open event0 error!\n");
+        return -1;
     }
-
-    int x1 = -1, y1 = -1; //记录点击事件中第一个点的坐标
-    int x2, y2; //记录点出事件中最后一个点的坐标
-
+    // 定义一个结构体,保存读取到的输入信息
+    struct input_event ev;
+    int x, y;
     while (1)
     {
-        struct input_event ev;
-        ret = read(fd, &ev, sizeof(ev));
+        // 2.读取输入事件
+        // read是一个阻塞的函数,没有数据可读的时候,会一直等待
+        int ret = read(fd_touch, &ev, sizeof(ev));
         if (ret != sizeof(ev))
         {
             continue;
         }
-
-        // printf("type: %x  code: %x  value: %x\n", ev.type, ev.code, ev.value);
-
-        //触摸屏的x轴事件
+        // 3.解析输入事件
         if (ev.type == EV_ABS && ev.code == ABS_X)
         {
-            if (x1 == -1)
-            {
-                x1 = ev.value;
-            }
-            x2 = ev.value;
+            x = ev.value; // 记录得到的x坐标
         }
-
-
-        
-        //触摸屏的y轴事件
         if (ev.type == EV_ABS && ev.code == ABS_Y)
         {
-            if (y1 == -1)
-            {
-                y1 = ev.value;
-            }
-            y2 = ev.value;
+            y = ev.value; // 记录得到的y坐标
         }
-
-        //触摸屏弹起事件
-        if ( (ev.type == EV_KEY && ev.code == BTN_TOUCH &&  ev.value == 0) ||
-             (ev.type == EV_ABS && ev.code == ABS_PRESSURE && ev.value ==0) )
+        // 当手指离开触摸屏的时候结束
+        if (ev.type == EV_KEY && ev.code == BTN_TOUCH && ev.value == 0)
         {
-            x1 = x1 * 800.0 / 1024;
-            x2 = x2 * 800.0 / 1024;
-
-            y1 = y1 * 480.0 / 600;
-            y2 = y2 * 480.0 / 600;
-
-            p->x = x2;
-            p->y = y2;
             break;
         }
     }
+    // 5.关闭触摸屏
+    close(fd_touch);
 
+    // 4.得到坐标
+    x = x / 1.28;
+    y = y / 1.25;
+    printf("x = %d,y = %d\n", x, y);
 
-    close(fd);
+    // 得到坐标,完成什么逻辑,由用户控制
+    if (x > 30 && x < 230 && y >= 60 && y < 210)
+    {
+        return 1;
+    }
+    else if (x > 270 && x < 470 && y > 60 && y < 210)
+    {
+        return 2;
+    }
+    else if (x > 30 && x < 230 && y > 240 && y < 390)
+    {
+        return 3;
+    }
+    else if (x > 270 && x < 470 && y > 240 && y < 390)
+    {
+        return 4;
+    }
+    else if (x > 470 && x < 600 && y > 0 && y < 200)
+    {
+        return 5;
+    }
+    else if (x > 601 && x < 800 && y > 0 && y < 200)
+    {
+        return 6;
+    }
+    else if (x > 500 && x < 800 && y > 201 && y < 480)
+    {
+        return 7;
+    }
 }
 
-//获取手指在触摸屏上的滑动方向
+// 触摸屏函数,可以判断手指是否点击了指定的位置(suolue_goto)
+int get_touch_suolue_goto()
+{
+    // 1.打开触摸屏
+    int fd_touch = open("/dev/input/event0", O_RDWR);
+    if (fd_touch == -1)
+    {
+        printf("open event0 error!\n");
+        return -1;
+    }
+    // 定义一个结构体,保存读取到的输入信息
+    struct input_event ev;
+    int x, y;
+    while (1)
+    {
+        // 2.读取输入事件
+        // read是一个阻塞的函数,没有数据可读的时候,会一直等待
+        int ret = read(fd_touch, &ev, sizeof(ev));
+        if (ret != sizeof(ev))
+        {
+            continue;
+        }
+        // 3.解析输入事件
+        if (ev.type == EV_ABS && ev.code == ABS_X)
+        {
+            x = ev.value; // 记录得到的x坐标
+        }
+        if (ev.type == EV_ABS && ev.code == ABS_Y)
+        {
+            y = ev.value; // 记录得到的y坐标
+        }
+        // 当手指离开触摸屏的时候结束
+        if (ev.type == EV_KEY && ev.code == BTN_TOUCH && ev.value == 0)
+        {
+            break;
+        }
+    }
+    // 5.关闭触摸屏
+    close(fd_touch);
+
+    // 4.得到坐标
+    x = x / 1.28;
+    y = y / 1.25;
+    printf("x = %d,y = %d\n", x, y);
+    // 得到坐标,完成什么逻辑,由用户控制
+    if (x >= 30 && x < 230 && y >= 60 && y < 210)
+    {
+        return 1;
+    }
+    else if (x >= 270 && x < 470 && y >= 60 && y < 210)
+    {
+        return 2;
+    }
+    else if (x >= 510 && x < 710 && y >= 60 && y < 210)
+    {
+        return 3;
+    }
+    else if (x >= 30 && x < 230 && y >= 240 && y < 390)
+    {
+        return 4;
+    }
+    else if (x >= 270 && x < 470 && y >= 240 && y < 390)
+    {
+        return 5;
+    }
+    else if (x >= 510 && x < 710 && y >= 240 && y < 390)
+    {
+        return 6;
+    }
+}
+
+// 获取手指在触摸屏上的滑动方向
 move_dir_t get_ts_direction(void)
 {
     int ret;
     int fd;
+    // printf("----1---\n");
     move_dir_t dir = MOVE_UNKNOWN;
 
     fd = open("/dev/input/event0", O_RDONLY);
@@ -147,9 +230,9 @@ move_dir_t get_ts_direction(void)
         perror("failed to open /dev/input/event0");
         return MOVE_UNKNOWN;
     }
-
-    int x1 = -1, y1 = -1; //记录点击事件中第一个点的坐标
-    int x2, y2; //记录点出事件中最后一个点的坐标
+    // printf("----2---\n");
+    int x1 = -1, y1 = -1; // 记录点击事件中第一个点的坐标
+    int x2, y2;           // 记录点出事件中最后一个点的坐标
 
     while (1)
     {
@@ -162,7 +245,7 @@ move_dir_t get_ts_direction(void)
 
         // printf("type: %x  code: %x  value: %x\n", ev.type, ev.code, ev.value);
 
-        //触摸屏的x轴事件
+        // 触摸屏的x轴事件
         if (ev.type == EV_ABS && ev.code == ABS_X)
         {
             if (x1 == -1)
@@ -172,9 +255,7 @@ move_dir_t get_ts_direction(void)
             x2 = ev.value;
         }
 
-
-        
-        //触摸屏的y轴事件
+        // 触摸屏的y轴事件
         if (ev.type == EV_ABS && ev.code == ABS_Y)
         {
             if (y1 == -1)
@@ -184,9 +265,9 @@ move_dir_t get_ts_direction(void)
             y2 = ev.value;
         }
 
-        //触摸屏弹起事件
-        if ( (ev.type == EV_KEY && ev.code == BTN_TOUCH &&  ev.value == 0) ||
-             (ev.type == EV_ABS && ev.code == ABS_PRESSURE && ev.value ==0) )
+        // 触摸屏弹起事件
+        if ((ev.type == EV_KEY && ev.code == BTN_TOUCH && ev.value == 0) ||
+            (ev.type == EV_ABS && ev.code == ABS_PRESSURE && ev.value == 0))
         {
             int delt_x = abs(x2 - x1);
             int delt_y = abs(y2 - y1);
@@ -203,7 +284,6 @@ move_dir_t get_ts_direction(void)
                 }
 
                 break;
-
             }
             else if (delt_y >= 2 * delt_x)
             {
@@ -217,16 +297,14 @@ move_dir_t get_ts_direction(void)
                 }
                 break;
             }
-            else 
+            else
             {
-                //方向不明，请继续
+                // 方向不明，请继续
                 x1 = -1;
                 y1 = -1;
             }
-
         }
     }
-
 
     close(fd);
 
