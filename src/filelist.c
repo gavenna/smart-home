@@ -41,6 +41,24 @@ void add_FileNode(FileList *list, FileNode *p)
     }
 }
 
+void make_inode(FileList *list)
+{
+    list->cur = list->first;
+    int i = 0;
+    do
+    {
+        list->cur->i_node = i;
+        i++;
+        list->cur = list->cur->next;
+        if (list->cur == NULL)
+        {
+            list->cur == list->first;
+            return;
+        }
+
+    } while (list->cur != list->first);
+}
+
 void print_FistList(FileList *list)
 {
     if (list == NULL || list->first == NULL)
@@ -48,13 +66,17 @@ void print_FistList(FileList *list)
         printf("FileList IS  EMPTY!\n");
         return;
     }
-
     FileNode *p = list->first;
-    while (p == list->last)
+    do
     {
         printf("pic_name: %s\n", p->pic_name);
+        printf("list_inode:%d\n", p->i_node);
         p = p->next;
-    }
+        if (p == NULL)
+        {
+            return;
+        }
+    } while (p != list->first);
 }
 
 void change_to_next_pictures(FileList *list)
@@ -113,6 +135,7 @@ FileList *search_pictures(const char *path)
         {
             FileNode *p = (FileNode *)malloc(sizeof(*p));
             strcpy(p->pic_name, filename);
+            int i_node = 0;
             p->next = NULL;
             p->prev = NULL;
 

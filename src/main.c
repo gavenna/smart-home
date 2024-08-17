@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
-FileList *list;
+FileList *list_content;
 FileList *list_menu;
 FileList *list_suolue;
 
@@ -40,17 +40,21 @@ int main(int argc, char *argv[])
     lcd_open();
     printf("action!\n");
 
-    list = search_pictures(MAINPIC);
-    print_FistList(list);
+    list_content = search_pictures(MAINPIC);
+    make_inode(list_content);
+    print_FistList(list_content);
 
     list_menu = search_pictures(MENU);
+    make_inode(list_menu);
     print_FistList(list_menu);
 
     list_suolue = search_pictures(SUOLUE);
+    make_inode(list_suolue);
     print_FistList(list_suolue);
+    printf("---if--yhtere-faile?--\n");
 
     MENU_INIT();
-
+    printf("---test--again--\n");
     // pthread_t tid2;
     // printf("main thread,ID is %u\n", pthread_self());
     // int done = pthread_create(&tid2, NULL, total_display, NULL);
@@ -59,7 +63,6 @@ int main(int argc, char *argv[])
     //     printf("thread creation failed\n");
     //     exit(1);
     // }
-
     while (1)
     {
         int option = get_touch();

@@ -8,7 +8,7 @@
 #include <pthread.h>
 #include <stdio.h>
 
-extern FileList *list;
+extern FileList *list_content;
 extern FileList *list_menu;
 extern FileList *list_suolue;
 
@@ -19,8 +19,7 @@ extern int thread_prevent_redefine;
 
 void *MENU_INIT(void)
 {
-    // background
-    // bmp_display(list_menu->cur->pic_name, 494, 0);
+    list_menu->cur = list_menu->first;
     bmp_display(list_menu->cur->pic_name, 0, 0);
     // message_show
     word_cicle_display(500, 100, 40, 37, 0, 3);
@@ -36,8 +35,8 @@ void *pic_circle(void *arg)
     lcd_draw_rectangle(0, 0, 800, 480, 0x0f0f0f);
     while (1)
     {
-        bmp_display(list->cur->pic_name, 0, 0);
-        change_to_next_pictures(list);
+        bmp_display(list_content->cur->pic_name, 0, 0);
+        change_to_next_pictures(list_content);
         sleep(1);
         if (thread_flag != 0)
         {
@@ -57,6 +56,7 @@ void suolue_display()
         if (i < 2)
         {
             bmp_display(list_suolue->cur->pic_name, 30 + count_1 * 240, 60);
+
             count_1++;
         }
         else
@@ -83,7 +83,7 @@ void *total_display(void *arg)
         {
         case 1:
         {
-                }
+        }
         break;
         case 5:
         {
