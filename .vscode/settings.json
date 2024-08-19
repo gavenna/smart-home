@@ -5,7 +5,9 @@
         "stdio.h": "c",
         "fcntl.h": "c",
         "hanzi.h": "c",
-        "filelist.h": "c"
+        "filelist.h": "c",
+        "pthread.h": "c",
+        "menudisplay.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

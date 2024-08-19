@@ -20,6 +20,28 @@ FileList *create_FileList(void)
     return list;
 }
 
+// 删除整个链表
+void destoy_list(FileList *list)
+{
+    if (list == NULL)
+    {
+        return;
+    }
+    FileNode *p = list->last;
+    while (list->first == list->last)
+    {
+        list->last = list->last->prev;
+        list->last->next = NULL;
+        p->next = NULL;
+        p->prev = NULL;
+        free(p);
+        p = list->last;
+    }
+    free(list->first);
+    free(list);
+}
+
+
 void add_FileNode(FileList *list, FileNode *p)
 {
     if (list == NULL || p == NULL)
