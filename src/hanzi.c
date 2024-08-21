@@ -119,6 +119,34 @@ void hanzi_no_bk_display(
 // }
 // }
 
+void display_digit(int color, int x0, int y0, int number, int w, int h)
+{
+    int digit_width = 24;
+    int digit_high = 37;
+    int count = 0;
+    int i, j, a[100] = {0};
+    if (number == 0)
+    {
+        // display_word(color, x0, y0, digits[0], w, h);
+        hanzi_no_bk_display(color, x0, y0, w, h, digit[0]);
+    }
+    else
+    {
+        for (i = 0; number != 0; i++)
+        {
+            a[i] = number % 10;
+            number /= 10;
+        }
+        for (j = i - 1; j >= 0; j--)
+        {
+            // printf("%d\n", a[j]);
+            // display_word(color, x0, y0 + m * 8, digits[a[j]], w, h);
+            hanzi_no_bk_display(color, (x0 + count * digit_width), y0, digit_width, digit_high, digit[a[j]]);
+            count++;
+        }
+    }
+}
+
 // 从左往右输出 整数
 void digit_display(int num, int x0, int y0)
 {
@@ -127,6 +155,11 @@ void digit_display(int num, int x0, int y0)
     int gewei;
     int digit_width = 24;
     int digit_high = 37;
+    if (num == 0)
+    {
+        hanzi_display(x0, y0, digit_width, digit_high, digit[0]);
+    }
+
     if (num < 0)
     {
         hanzi_display(x0, y0, digit_width, digit_high, digit[11]);
@@ -238,13 +271,24 @@ void digit_double_new(double num, int x0, int y0)
     }
 }
 
-// 循环显示文字
+// 显示文字
 void word_cicle_display(int x0, int y0, int w, int h, int dest_first, int dest_last)
 {
     int count = 0;
     for (int i = dest_first; i <= dest_last; i++)
     {
-        hanzi_no_bk_display(0xabdcef, x0 + count * w, y0, w, h, hanzi[i]);
+        hanzi_no_bk_display(0xabdcef, x0 + count * w, y0, w, h, hanzi_rin[i]);
         count++;
     }
 }
+
+// // 循环显示文字
+// void word_cicle_display(int x0, int y0, int w, int h, int dest_first, int dest_last)
+// {
+//     int count = 0;
+//     for (int i = dest_first; i <= dest_last; i++)
+//     {
+//         hanzi_no_bk_display(0xabdcef, x0 + count * w, y0, w, h, effect[i]);
+//         count++;
+//     }
+// }

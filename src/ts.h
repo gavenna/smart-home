@@ -27,6 +27,8 @@ int get_touch_suolue_goto();
 
 int get_touch_global_stop();
 
+int get_touch_video();
+
 move_dir_t get_ts_direction(void);
 
 #endif

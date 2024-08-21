@@ -55,17 +55,21 @@ int get_touch()
     y = y / 1.25;
     printf("x = %d,y = %d\n", x, y);
     // 得到坐标,完成什么逻辑,由用户控制
-    if (x >= 600 && x < 800 && y >= 0 && y < 240)
+    if (x >= 280 && x < 350 && y >= 150 && y < 220)
     {
         return 1;
     }
-    else if (x >= 600 && x < 800 && y >= 240 && y < 430)
+    else if (x >= 500 && x < 600 && y >= 150 && y < 250)
     {
         return 2;
     }
-    else if (x >= 300 && x <= 600 && y >= 430 && y <= 480)
+    else if (x >= 280 && x <= 350 && y >= 300 && y <= 430)
     {
-        return 100;
+        return 3;
+    }
+    else if (x >= 500 && x < 600 && y >= 300 && y <= 430)
+    {
+        return 4;
     }
 }
 
@@ -131,11 +135,11 @@ int get_touch_suolue()
     {
         return 4;
     }
-    else if (x >= 500 && x < 750 && y >= 0 && y < 200)
+    else if (x >= 600 && x < 800 && y >= 0 && y < 200)
     {
         return 5;
     }
-    else if (x >= 750 && x < 800 && y >= 0 && y < 200)
+    else if (x >= 600 && x < 800 && y >= 200 && y < 400)
     {
         return 6;
     }
@@ -244,6 +248,60 @@ int get_touch_global_stop()
     if (x >= 350 && x < 550 && y >= 430 && y < 480)
     {
         return 1;
+    }
+}
+
+int get_touch_video()
+{
+    // 1.打开触摸屏
+    int fd_touch = open("/dev/input/event0", O_RDWR);
+    if (fd_touch == -1)
+    {
+        printf("open event0 error!\n");
+        return -1;
+    }
+    // 定义一个结构体,保存读取到的输入信息
+    struct input_event ev;
+    int x, y;
+    while (1)
+    {
+        // 2.读取输入事件
+        // read是一个阻塞的函数,没有数据可读的时候,会一直等待
+        int ret = read(fd_touch, &ev, sizeof(ev));
+        if (ret != sizeof(ev))
+        {
+            continue;
+        }
+        // 3.解析输入事件
+        if (ev.type == EV_ABS && ev.code == ABS_X)
+        {
+            x = ev.value; // 记录得到的x坐标
+        }
+        if (ev.type == EV_ABS && ev.code == ABS_Y)
+        {
+            y = ev.value; // 记录得到的y坐标
+        }
+        // 当手指离开触摸屏的时候结束
+        if (ev.type == EV_KEY && ev.code == BTN_TOUCH && ev.value == 0)
+        {
+            break;
+        }
+    }
+    // 5.关闭触摸屏
+    close(fd_touch);
+
+    // 4.得到坐标
+    x = x / 1.28;
+    y = y / 1.25;
+    printf("x = %d,y = %d\n", x, y);
+    // 得到坐标,完成什么逻辑,由用户控制
+    if (x >= 550 && x < 800 && y >= 100 && y < 250)
+    {
+        return 1;
+    }
+    else if (x >= 550 && x < 800 && y >= 250 && y < 430)
+    {
+        return 2;
     }
 }
 

@@ -121,3 +121,27 @@ void lcd_draw_rectangle(int x0, int y0, // 矩形左上顶点的坐标
         }
     }
 }
+
+void lcd_draw_ONE_REBOX(int x0, int y0, int w, int h, int color)
+{
+    int x, y;
+    for (x = x0; x < x0 + w; x++)
+    {
+        lcd_draw_point(x, y0, color);
+        lcd_draw_point(x, y0 + h - 1, color);
+    }
+
+    for (y = y0 + 1; y < y0 + h - 1; y++)
+    {
+        lcd_draw_point(x0, y, color);
+        lcd_draw_point(x0 + w - 1, y, color);
+    }
+}
+
+void lcd_draw_REBOX(int x0, int y0, int w, int h, int large, int color)
+{
+    do
+    {
+        lcd_draw_ONE_REBOX(x0 - large - 1, y0 - large - 1, w + (large - 1) * 2, h + (large - 1) * 2, color);
+    } while (--large);
+}

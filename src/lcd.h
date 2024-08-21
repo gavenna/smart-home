@@ -3,22 +3,19 @@
 #ifndef __LCD_H__
 #define __LCD_H__
 
-extern int fb_fd ; //帧缓冲设备的 文件描述符
+extern int fb_fd; // 帧缓冲设备的 文件描述符
 
-extern int  lcd_width ;//屏幕宽度
-extern int  lcd_height;//屏幕高度
-extern int  bytes_per_pixel; //每个像素点所占字节数
+extern int lcd_width;       // 屏幕宽度
+extern int lcd_height;      // 屏幕高度
+extern int bytes_per_pixel; // 每个像素点所占字节数
 
-extern int* plcd ; //指向帧缓冲区的首地址
+extern int *plcd; // 指向帧缓冲区的首地址
 
-
-//打开屏幕
+// 打开屏幕
 void lcd_open(void);
 
-
-//关闭屏幕
+// 关闭屏幕
 void lcd_close(void);
-
 
 /*
     lcd_draw_point:画点函数
@@ -31,11 +28,9 @@ void lcd_close(void);
 */
 void lcd_draw_point(int x, int y, int color);
 
+void lcd_draw_rectangle(int x0, int y0, // 矩形左上顶点的坐标
+                        int w, int h,   // 矩形的宽和高
+                        int color);     // 矩形的颜色
 
-
-
-void lcd_draw_rectangle(int x0, int y0, //矩形左上顶点的坐标
-                        int w, int h,  //矩形的宽和高
-                        int color); //矩形的颜色
-
-#endif 
+void lcd_draw_REBOX(int x0, int y0, int w, int h, int large, int color);
+#endif

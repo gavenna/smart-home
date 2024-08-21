@@ -164,7 +164,7 @@ void bmp_icon_display(const char *bmp_file, int x0, int y0)
             }
 
             color = (a << 24) | (r << 16) | (g << 8) | b;
-            if (color == 0x00000000)
+            if (color == 0x000000)
                 continue;
             lcd_draw_point(x0 + x, y0 + abs(height) - 1 - y, color);
         }
