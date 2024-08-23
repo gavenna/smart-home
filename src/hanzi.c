@@ -157,12 +157,13 @@ void digit_display(int num, int x0, int y0)
     int digit_high = 37;
     if (num == 0)
     {
-        hanzi_display(x0, y0, digit_width, digit_high, digit[0]);
+        // hanzi_display(x0, y0, digit_width, digit_high, digit[0]);
+        hanzi_no_bk_display(0xff3123, x0, y0, digit_width, digit_high, digit[0]);
     }
 
     if (num < 0)
     {
-        hanzi_display(x0, y0, digit_width, digit_high, digit[11]);
+        hanzi_no_bk_display(0xff3123, x0, y0, digit_width, digit_high, digit[11]);
         num *= -1;
         count++;
     }
@@ -176,7 +177,8 @@ void digit_display(int num, int x0, int y0)
             {
                 gewei = num / cheng;
                 num -= gewei * cheng;
-                hanzi_display((x0 + count * digit_width), y0, digit_width, digit_high, digit[gewei]);
+                // hanzi_display((x0 + count * digit_width), y0, digit_width, digit_high, digit[gewei]);
+                hanzi_no_bk_display(0xff3123, (x0 + count * digit_width), y0, digit_width, digit_high, digit[gewei]);
                 cheng /= 10;
                 count++;
             }
@@ -278,6 +280,17 @@ void word_cicle_display(int x0, int y0, int w, int h, int dest_first, int dest_l
     for (int i = dest_first; i <= dest_last; i++)
     {
         hanzi_no_bk_display(0xabdcef, x0 + count * w, y0, w, h, hanzi_rin[i]);
+        count++;
+    }
+}
+
+// 显示缩略文字
+void word_suolue_display(int x0, int y0, int w, int h, int dest_first, int dest_last)
+{
+    int count = 0;
+    for (int i = dest_first; i <= dest_last; i++)
+    {
+        hanzi_no_bk_display(0xabdcef, x0 + count * w, y0, w, h, suolue[i]);
         count++;
     }
 }

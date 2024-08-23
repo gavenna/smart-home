@@ -295,13 +295,17 @@ int get_touch_video()
     y = y / 1.25;
     printf("x = %d,y = %d\n", x, y);
     // 得到坐标,完成什么逻辑,由用户控制
-    if (x >= 550 && x < 800 && y >= 100 && y < 250)
+    if (x >= 550 && x < 800 && y >= 0 && y < 125)
     {
         return 1;
     }
-    else if (x >= 550 && x < 800 && y >= 250 && y < 430)
+    else if (x >= 550 && x < 800 && y >= 130 && y < 250)
     {
         return 2;
+    }
+    else if (x >= 550 && x < 800 && y > 270 & y < 430)
+    {
+        return 3;
     }
 }
 

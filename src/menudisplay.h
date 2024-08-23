@@ -15,6 +15,8 @@ void *total_display(void *arg);
 // 缩略显示
 void suolue_display();
 
+void suolue_name(int i, int j);
+
 // icon show
 void *show_icon(void *arg);
 

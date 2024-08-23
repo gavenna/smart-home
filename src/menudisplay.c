@@ -56,6 +56,7 @@ void MENU_INIT(void)
     // word_cicle_display(500, 300, 40, 37, 0, 3);
 
     lcd_draw_rectangle(0, 430, 800, 50, 0x0f0000);
+    daohan_display();
 
     bmp_icon_display(icon_name[5], 220, 200);
 
@@ -103,26 +104,78 @@ void *pic_circle(void *arg)
     }
 }
 
+void suolue_name(int i, int j)
+{
+    switch (i)
+    {
+    case 0:
+    {
+        word_suolue_display(30 + j * 240, 20 + 150, 40, 37, 0, 1);
+    }
+    break;
+    case 1:
+    {
+        word_suolue_display(30 + j * 240, 20 + 150, 40, 37, 2, 5);
+    }
+    break;
+    case 4:
+    {
+        word_suolue_display(30 + j * 240, 20 + 150, 40, 37, 13, 17);
+    }
+    break;
+    case 5:
+    {
+        word_suolue_display(30 + j * 240, 20 + 150, 40, 37, 18, 22);
+    }
+    break;
+    case 2:
+    {
+        word_suolue_display(30 + j * 240, 230 + 150, 40, 37, 6, 9);
+    }
+    break;
+    case 3:
+    {
+        word_suolue_display(30 + j * 240, 230 + 150, 40, 37, 10, 12);
+    }
+    break;
+    case 6:
+    {
+        word_suolue_display(30 + j * 240, 230 + 150, 40, 37, 23, 26);
+    }
+    break;
+    case 7:
+    {
+        word_suolue_display(30 + j * 240, 230 + 150, 40, 37, 27, 31);
+    }
+    break;
+    default:
+        break;
+    }
+}
+
 // suolue_display
 void suolue_display()
 {
     int count_1 = 0;
     int count_2 = 0;
     FileNode *p = list_suolue->cur;
+    lcd_draw_rectangle(0, 0, 480, 430, 0x0f0f0f);
     for (int i = 0; i < 4; i++)
     {
         printf("idnode--is:%d\n", p->i_node);
         if (i < 2)
         {
             bmp_display(p->pic_name, 30 + count_1 * 240, 20);
-            digit_display(p->i_node, 30 + 100 + count_1 * 240, 20 + 150);
+            // digit_display(p->i_node, 30 + 100 + count_1 * 240, 20 + 150);
+            suolue_name(p->i_node, count_1);
             // display_digit(0x0f0f03, 30 + 100 + count_1 * 240, 20 + 150,p->i_node, 24, 37);
             count_1++;
         }
         else
         {
             bmp_display(p->pic_name, 30 + count_2 * 240, 230);
-            digit_display(p->i_node, 30 + 100 + count_2 * 240, 230 + 150);
+            suolue_name(p->i_node, count_2);
+            // digit_display(p->i_node, 30 + 100 + count_2 * 240, 230 + 150);
             // display_digit(0x0f0f03, 30 + 100 + count_2 * 240, 230 + 150,p->i_node, 24, 37);
             count_2++;
         }
@@ -147,7 +200,7 @@ void *total_display(void *arg)
         if (count == 'E') // Only_f_One
         {
             printf("new_TIMING:%s\n", list_suolue->cur->pic_name);
-            lcd_draw_rectangle(0, 0, 800, 430, 0x0f0f20);
+            lcd_draw_rectangle(480, 0, 320, 430, 0x0f0f20);
             bmp_icon_display(left, 560, 60);
             bmp_icon_display(right, 560, 260);
             suolue_display();
@@ -431,20 +484,24 @@ void Video_play()
 
 void INIT_VIDEO()
 {
+    thread_music_flag = 1;
     thread_menu_flag = 1;
     thread_video_flag = 0;
     lcd_draw_rectangle(0, 0, 800, 430, 0x7c3672);
-    lcd_draw_REBOX(3, 3, 640, 430, 2, 0xf1f1f1);
-    bmp_icon_display(icon_name[9], 660, 100);
-    bmp_icon_display(icon_name[10], 660, 250);
-    bmp_icon_display(icon_name[10], 260, 170);
+    lcd_draw_REBOX(3, 3, 641, 428, 3, 0xf1f1f1);
+    bmp_icon_display(icon_name[9], 680, 50);
+    bmp_icon_display(icon_name[10], 680, 150);
+    bmp_icon_display(icon_name[10], 680, 290);
+    bmp_icon_display(icon_name[10], 270, 150);
 }
 
 void Video_thread()
 {
 
-    pthread_t adin_video;
+    pthread_t adin_video, testid;
     int done_advo = pthread_create(&adin_video, NULL, adin_Video, NULL);
+
+    printf("---verify_id--if:%d--\n", done_advo);
     if (done_advo != 0)
     {
         printf("thread_music creation failed\n");
@@ -456,6 +513,13 @@ void Video_thread()
 
 void *adin_Video(void *arg)
 {
+    int fd_1 = open("/home/china/1.fifo", O_RDWR);
+    printf("--fd--is :%d\n", fd_1);
+    if (fd_1 == -1)
+    {
+        perror("open fifo error");
+        exit(1);
+    }
     pthread_t vstop, current_tid;
     current_tid = pthread_self();
     ary_video[0] = (int)current_tid;
@@ -466,16 +530,7 @@ void *adin_Video(void *arg)
         printf("Video_stop creation failed\n");
         exit(1);
     }
-    printf("------test4---\n");
 
-    int fd_1 = open("/home/china/1.fifo", O_RDWR);
-    printf("--fd--is :%d\n", fd_1);
-    if (fd_1 == -1)
-    {
-        perror("open fifo error");
-        exit(1);
-    }
-    printf("---test5--\n");
     while (1)
     {
         int option_video = get_touch_video();
@@ -505,6 +560,18 @@ void *adin_Video(void *arg)
             printf("write cmd %d bytes \n", ret);
         }
         break;
+        case 3:
+        {
+            system("killall -9 mplayer");
+            video_i++;
+            if (video_i > 3)
+            {
+                video_i = 1;
+            }
+            // thread_music_flag = !thread_music_flag;
+            // thread_video_flag = !thread_video_flag;
+        }
+        break;
         default:
             break;
         }
@@ -514,18 +581,20 @@ void *adin_Video(void *arg)
 void *Video_stop(void *arg)
 {
     printf("add-----if--\n");
+    int stio_tid = *((int *)arg);
     while (1)
     {
         if (thread_video_flag != 0)
         {
+            pthread_cancel(stio_tid);
+            if (ary_video != 0)
+                pthread_cancel(ary_video[1]);
+            system("killall -9 mplayer");
 
-            pthread_cancel(ary_video[1]);
-            pthread_cancel(ary_video[0]);
             ary_video[0] = 0;
             ary_video[1] = 0;
             // sleep(2);
             thread_prevent_redefine_video = 0; // close_safe
-            MENU_INIT();
             pthread_exit(0);
         }
     }
@@ -539,14 +608,25 @@ void *playvideo(void *arg)
     // divorce_xc
     pthread_detach(pthread_self());
     char video_buf[128] = {0};
+
+    int fd_1 = open("/home/china/1.fifo", O_RDWR);
+    printf("--fd--is :%d\n", fd_1);
+    if (fd_1 == -1)
+    {
+        perror("open fifo error");
+        exit(1);
+    }
     while (1)
     {
-        if (thread_video_flag != 0)
-        {
-            continue;
-        }
-        system("killall -9 mplayer"); // 保证别的madplay死掉
-        sprintf(video_buf, "mplayer -slave -quiet -input  file=/home/china/1.fifo  -geometry  0:-30 -zoom -x 640 -y 430  ./mp4/1.mp4");
+        // if (thread_video_flag != 0)
+        // {
+        //     continue;
+        // }
+        // system("killall -9 mplayer"); // 保证别的madplay死掉
+        const char *cmd = "pause\n";
+        int ret = write(fd_1, cmd, strlen(cmd));
+        printf("write cmd %d bytes \n", ret);
+        sprintf(video_buf, "mplayer -slave -quiet -input  file=/home/china/1.fifo  -geometry  3:3 -zoom -x 640 -y 427  ./mp4/%d.mp4", video_i);
         printf("%s\n", video_buf);
         system(video_buf);
     }

@@ -8,6 +8,7 @@
 #include "ts.h"
 #include "menudisplay.h"
 #include "font.h"
+#include "sensor.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,6 +110,9 @@ int main(int argc, char *argv[])
         printf("thread_music creation failed\n");
         exit(1);
     }
+
+    Sensor_Run();
+
     sleep(2);
 
     while (1)
