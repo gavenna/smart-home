@@ -13,7 +13,7 @@
 // 触摸屏函数,可以判断手指是否点击了指定的位置
 int get_touch()
 {
-    // 1.打开触摸屏
+    // 打开触摸屏
     int fd_touch = open("/dev/input/event0", O_RDWR);
     if (fd_touch == -1)
     {
@@ -25,14 +25,13 @@ int get_touch()
     int x, y;
     while (1)
     {
-        // 2.读取输入事件
-        // read是一个阻塞的函数,没有数据可读的时候,会一直等待
+
         int ret = read(fd_touch, &ev, sizeof(ev));
         if (ret != sizeof(ev))
         {
             continue;
         }
-        // 3.解析输入事件
+        // 解析输入事件
         if (ev.type == EV_ABS && ev.code == ABS_X)
         {
             x = ev.value; // 记录得到的x坐标
@@ -47,10 +46,10 @@ int get_touch()
             break;
         }
     }
-    // 5.关闭触摸屏
+    // 关闭触摸屏
     close(fd_touch);
 
-    // 4.得到坐标
+    // 得到坐标
     x = x / 1.28;
     y = y / 1.25;
     printf("x = %d,y = %d\n", x, y);

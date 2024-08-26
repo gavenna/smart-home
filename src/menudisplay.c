@@ -399,7 +399,7 @@ void *FStop_xc(void *arg)
         {
 
             pthread_cancel(stio_tid);
-            sleep(2);
+            // sleep(2);
             thread_prevent_redefine_effect = 0;
             pthread_exit(0);
         }
@@ -513,13 +513,11 @@ void Video_thread()
 
 void *adin_Video(void *arg)
 {
-    int fd_1 = open("/home/china/1.fifo", O_RDWR);
-    printf("--fd--is :%d\n", fd_1);
-    if (fd_1 == -1)
-    {
-        perror("open fifo error");
-        exit(1);
-    }
+    // if (thread_video_flag != 0)
+    // {
+    //     pthread_exit(0);
+    // }
+
     pthread_t vstop, current_tid;
     current_tid = pthread_self();
     ary_video[0] = (int)current_tid;
@@ -528,6 +526,14 @@ void *adin_Video(void *arg)
     if (done_vostop != 0)
     {
         printf("Video_stop creation failed\n");
+        exit(1);
+    }
+
+    int fd_1 = open("/home/china/1.fifo", O_RDWR);
+    printf("--fd--is :%d\n", fd_1);
+    if (fd_1 == -1)
+    {
+        perror("open fifo error");
         exit(1);
     }
 
@@ -588,7 +594,11 @@ void *Video_stop(void *arg)
         {
             pthread_cancel(stio_tid);
             if (ary_video != 0)
+            {
                 pthread_cancel(ary_video[1]);
+                printf("test---exit--from--this--\n");
+            }
+
             system("killall -9 mplayer");
 
             ary_video[0] = 0;
